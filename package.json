@@ -5,8 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "collect": "npx ts-node-esm ./src/main.ts --inspect",
-    "translation": "npx ts-node-esm ./src/translation.ts"
+    "collect": "npx ts-node-esm ./src/main.ts i18n",
+    "export": "npx ts-node-esm ./src/main.ts i18n export path=D:/others/i18n/demo",
+    "import": "npx ts-node-esm ./src/main.ts i18n import path=D:/others/i18n/demo",
+    "build": "npx ts-node-esm ./src/translation.ts"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
     "@types/request": "^2.48.8",
     "chalk": "^5.2.0",
     "crypto-js": "^4.1.1",
+    "node-xlsx": "^0.21.0",
     "request": "^2.88.2"
   }
 }

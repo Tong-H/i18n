@@ -19,7 +19,8 @@
                 "toAffirmStopAe": "“停用Android企业版将重置所有Android企业版设备，所有相关策略将失效。”"
             },
             "lan2-80-56": {
-                "lan2-7ssfig": "复制配置${}"
+                "lan2-7ssfig": "复制配置${}",
+                "Sdsd": "my translator"
             },
             "lan2-7w": "my translator"
         }

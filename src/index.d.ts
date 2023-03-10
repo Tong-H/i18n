@@ -35,7 +35,7 @@ export interface CollectedLans {
 		value: string
 	}[]
 }
-;[]
+
 export interface Youdao {
 	api: string
 	key: string

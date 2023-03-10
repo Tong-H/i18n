@@ -3,7 +3,8 @@
 	"lan1-2": {
 		"lan2-7w": "copy config",
 		"lan2-80-56": {
-			"lan2-7ssfig": "copy config ${}"
+			"lan2-7ssfig": "copy config ${}",
+			"Sdsd": "sdsdsd"
 		},
 		"lan2-8-9": {
 			"aeIsNotRegester": "Android Enterprise activation not finished, click the following button to proceed",

@@ -4,17 +4,79 @@ import * as url from "node:url"
 import { Dirent } from "node:fs"
 import * as path from "node:path"
 import chalk from "chalk"
-///@ts-ignore
-import Translation from "./translation.ts"
+import Crypto from "crypto-js"
+import request from "request"
+import xlsx from "node-xlsx"
 
 const __filename = url.fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const rootPath = path.resolve(__dirname, "..")
-const log = console.log
+const Translation: Record<string, I18N.Translator> = {
+	youdao(config, details) {
+		const { from, to, text } = details
+		const options = config.translation?.resolve?.options as I18N.TranslationResolveYoudao["options"]
+		return new Promise((resolve, reject) => {
+			function truncate(q: string) {
+				const len = q.length
+				if (len <= 20) return q
+				return q.substring(0, 10) + len + q.substring(len - 10, len)
+			}
 
-const set = async (_p: string, context: any) => {
+			const appKey = options.appkey
+			const key = options.key
+			const salt = new Date().getTime()
+			const curtime = Math.round(new Date().getTime() / 1000)
+			const str1 = appKey + truncate(text) + salt + curtime + key
+
+			const sign = Crypto.SHA256(str1).toString(Crypto.enc.Hex)
+			const data = {
+				q: text,
+				appKey: appKey,
+				salt: salt,
+				from: from,
+				to: to,
+				sign: sign,
+				signType: "v3",
+				curtime: curtime,
+				vocabId: options.vocabId || "",
+			}
+			request.post(options.api, { form: data }, (error, response, body) => {
+				if (error) {
+					reject({ errorCode: -1, error: body })
+					return
+				}
+				try {
+					const _res = JSON.parse(body)
+					_res.translation ? resolve(_res.translation[0]) : reject({ errorCode: -3, error: _res })
+				} catch (error) {
+					reject({ errorCode: -2, error: body })
+				}
+			})
+		})
+	},
+}
+const commands = {
+	isExport: false,
+	isImport: false,
+	path: undefined as string | undefined,
+}
+
+process.argv.forEach((item, index) => {
+	item === "export" && (commands.isExport = true)
+	item === "import" && (commands.isImport = true)
+	if (commands.isExport || commands.isImport) {
+		;/^path=/.test(item) && (commands.path = item.replace(/path=/, ""))
+	}
+})
+
+const log = console.log,
+	set = async (_p: string, context: any) => {
 		log(chalk.green(`update ${_p}`))
-		await fs.writeFile(_p, JSON.stringify(context, null, 4))
+		if (/.json$/.test(_p)) {
+			await fs.writeFile(_p, JSON.stringify(context, null, 4))
+		} else if (/.xls$/.test(_p)) {
+			await fs.writeFile(_p, context)
+		}
 	},
 	get = async <T>(_p: string): Promise<T | undefined> => {
 		if (!(await isExists(_p))) return
@@ -84,7 +146,7 @@ const set = async (_p: string, context: any) => {
 		)
 		return { remainder, removed }
 	},
-	toAdd = (lan: I18N.Lan, _referResMap: I18N.LanMap, referResMapKey: Record<string, string[]>, parents: string[] = [], added: { key: typeof parents; value: string }[] = []) => {
+	toAdd = (lan: I18N.Lan, _referResMap: I18N.LanMap, parents: string[] = [], added: { key: typeof parents; value: string }[] = []) => {
 		for (const [key, value] of _referResMap.entries()) {
 			const _value = value === undefined ? {} : value
 			let last: I18N.Lan = lan,
@@ -126,7 +188,7 @@ const set = async (_p: string, context: any) => {
 
 		return
 	},
-	toTranslate = async (lanItems: I18N.TranslationItem[], config: I18N.Config, refer: I18N.Config["refer"], translator: I18N.Translator) => {
+	translate = async (lanItems: I18N.TranslationItem[], config: I18N.Config, refer: I18N.Config["refer"], translator: I18N.Translator) => {
 		const error: I18N.TranslationItem[] = []
 		const result = await Promise.all(
 			lanItems.map(async (item, index) => {
@@ -156,7 +218,7 @@ const set = async (_p: string, context: any) => {
 			}, index * 1000)
 		})
 	},
-	toReplace = (lanItems: I18N.TranslationItem[], lanResults: I18N.CollectedLans[]) => {
+	translated = (lanItems: I18N.TranslationItem[], lanResults: I18N.CollectedLans[]) => {
 		const _find = (lanName: string) => lanResults.find((item) => item.name === lanName)
 		lanItems.forEach((item) => {
 			const lan = _find(item.lanName)
@@ -176,10 +238,7 @@ const set = async (_p: string, context: any) => {
 		lanResults.forEach((item) => set(item.path, item.result))
 	}
 
-;(async () => {
-	const config = await getConfig(rootPath)
-	if (!config) return
-
+const toUpdate = async (config: I18N.Config) => {
 	const destination = path.resolve(rootPath, config.destination)
 
 	const toCollect = async (paths: Dirent[] | string, parent: string): Promise<I18N.Lan[]> => {
@@ -242,6 +301,7 @@ const set = async (_p: string, context: any) => {
 	}
 
 	set(path.resolve(destination, `${config.refer}.json`), referRes)
+
 	const lanResults = (
 		await Promise.all(
 			config.culture
@@ -265,7 +325,7 @@ const set = async (_p: string, context: any) => {
 				result: I18N.Lan
 			}
 			const { remainder, removed } = toReduce(_item.result, referResMap, referResMapKey)
-			const { result, added } = toAdd(remainder, referResMap, referResMapKey)
+			const { result, added } = toAdd(remainder, referResMap)
 
 			set(_item.path, result)
 			return {
@@ -283,13 +343,14 @@ const set = async (_p: string, context: any) => {
 		const logInfo = { added: Object.fromEntries(added), removed: Object.fromEntries(removed) }
 		set(path.resolve(destination, `_conclusion.json`), logInfo)
 	}
+	return lanResults
+}
 
-	if (!config.translation || !config.translation.auto) return
-
+const toTranslate = async (config: I18N.Config, lanResults: I18N.CollectedLans[]) => {
 	const translator =
-		typeof config.translation.custom === "function"
+		typeof config.translation?.custom === "function"
 			? config.translation.custom
-			: Translation[config.translation.resolve?.translator]
+			: config.translation?.resolve?.translator && Translation[config.translation.resolve?.translator]
 			? Translation[config.translation.resolve?.translator]
 			: undefined
 	if (typeof translator !== "function") {
@@ -300,17 +361,64 @@ const set = async (_p: string, context: any) => {
 	const translation = config.translation as I18N.Translation
 	const lanItems = lanResults.map((_lan) => _lan.added.filter((item) => item.value !== "{}").map((item) => ({ ...item, lanName: _lan.name }))).flat(1)
 
-	const { result: translationResults, error } = await toTranslate(lanItems, config, config.refer, translator)
-	toReplace(translationResults, lanResults)
+	if (lanItems.length === 0) return
+
+	const { result: translationResults, error } = await translate(lanItems, config, config.refer, translator)
+	translated(translationResults, lanResults)
 
 	if (error.length > 0 && typeof translation.retryTime === "number" && translation.retryTime > -1) {
 		let current = 0,
 			errors = error
 		while (current <= translation.retryTime && errors.length > 0) {
-			const { result: translationResults, error } = await toTranslate(lanItems, config, config.refer, translator)
-			toReplace(translationResults, lanResults)
+			const { result: translationResults, error } = await translate(lanItems, config, config.refer, translator)
+			translated(translationResults, lanResults)
 			errors = error
 			current++
 		}
 	}
+}
+
+const getLanRes = async (config: I18N.Config) => {
+	const destination = path.resolve(rootPath, config.destination)
+	return await Promise.all(
+		config.culture.map(async (item) => {
+			const _p = path.resolve(destination, `${item}.json`)
+			if (!(await isExists(_p))) {
+				return
+			}
+			const _lan = await get<I18N.Lan>(_p)
+			if (_lan) return { name: item, result: _lan }
+			return
+		})
+	)
+}
+
+const toExport = async (config: I18N.Config) => {
+	if (!commands.path) return
+	const destination = commands.path
+
+	const lanRes = await getLanRes(config)
+	lanRes.map((item) => {
+		if (item === undefined) return
+		const [referResMap, referResMapKey] = toFlat(item?.result)
+		const data: any[] = []
+		referResMap.forEach((val, key) => data.push([key.toString(), val]))
+		set(path.resolve(destination, item.name + ".xls"), xlsx.build([{ name: item.name, data: data, options: {} }]))
+	})
+}
+
+;(async () => {
+	const config = await getConfig(rootPath)
+	if (!config) return
+
+	if (commands.isExport) {
+		toExport(config)
+		return
+	} else if (commands.isImport) {
+		return
+	}
+	const lanResults = await toUpdate(config)
+
+	if (!config.translation || !config.translation.auto) return
+	toTranslate(config, lanResults)
 })()

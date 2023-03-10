@@ -1,7 +1,11 @@
 {
     "added": {
-        "zh-CHS": {},
-        "ja": {}
+        "zh-CHS": {
+            "lan1,lan1-2,lan2-80-56,Sdsd": "\"sdsdsd\""
+        },
+        "ja": {
+            "lan1,lan1-2,lan2-80-56,Sdsd": "\"sdsdsd\""
+        }
     },
     "removed": {
         "zh-CHS": {},
