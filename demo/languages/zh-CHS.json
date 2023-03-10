@@ -1,0 +1,27 @@
+{
+    "lan1": {
+        "lan1-1": "language",
+        "lan1-2": {
+            "lan2-8-9": {
+                "aeIsNotRegester": "“Android企业激活未完成，请单击以下按钮继续”",
+                "aeIsNotStart": "“Android企业版未激活，请单击以下按钮继续”",
+                "delAe": "“停用Android企业版”",
+                "delInfo": "声发射系统已激活，点击按钮关闭",
+                "enrollAE": "“激活Android企业版”",
+                "errorInfo": "\"服务器错误，请与管理员联系以获取更多信息\"",
+                "header": "“Android企业设置”",
+                "packageName": "填写包名(请先在AE私有商店上传包;如果它是一个无效的包名，将不会生效，也不会中断注册)”",
+                "settingConfirm": "“激活”",
+                "settingProcedureTips": "“此定制将应用于所有使用AE或ZT注册的设备。</br>如需自定义，请联系管理员\"",
+                "startAe": "“启动Android企业版”",
+                "stopConfirm": "“禁用”",
+                "toAffirmStartAe": "“确认激活Android企业版?”",
+                "toAffirmStopAe": "“停用Android企业版将重置所有Android企业版设备，所有相关策略将失效。”"
+            },
+            "lan2-80-56": {
+                "lan2-7ssfig": "复制配置${}"
+            },
+            "lan2-7w": "my translator"
+        }
+    }
+}

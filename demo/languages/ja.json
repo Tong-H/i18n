@@ -1,0 +1,27 @@
+{
+    "lan1": {
+        "lan1-1": "language",
+        "lan1-2": {
+            "lan2-8-9": {
+                "aeIsNotRegester": "「android enterpriseのアクティベーションが完了していません。次のボタンをクリックして続行してください」",
+                "aeIsNotStart": "「android enterpriseがアクティベーションされていません。次のボタンをクリックして続行してください」",
+                "delAe": "「無効アンドロイド企業」",
+                "delInfo": "「aeシステムが有効になったら、ボタンをクリックして無効にします。",
+                "enrollAE": "「Android発動企業」",
+                "errorInfo": "「サーバーエラーです。詳細は管理者にお問い合わせください」",
+                "header": "「Android企業設定(defeat device)」",
+                "packageName": "「パッケージ名を記入してください(パッケージをアップロードするには、まずaeプライベートストアにしてください。無効なパッケージ名であれば有効ではなく、登録を中断することはありません)」",
+                "settingConfirm": "「発動」",
+                "settingProcedureTips": "「このカスタマイズはaeまたはztを使用して加入するすべてのデバイスに適用されます。</br>カスタマイズが必要な場合は、管理者に連絡してください。",
+                "startAe": "「開始Android企業」",
+                "stopConfirm": "「無効」",
+                "toAffirmStartAe": "「android enterpriseのアクティベーションを確認しましたか?」",
+                "toAffirmStopAe": "「android enterpriseを無効にすると、すべてのandroid enterpriseデバイスがリセットされ、関連するすべてのポリシーが無効になります。"
+            },
+            "lan2-80-56": {
+                "lan2-7ssfig": "「この{ドルコピーconfig」"
+            },
+            "lan2-7w": "my translator"
+        }
+    }
+}

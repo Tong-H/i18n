@@ -1,8 +1,25 @@
 {
-	"lan": "language",
-	"new": "nelllllllllw",
-	"animals": {
-		"dog": "dog",
-		"cat": "cat"
+	"lan1-1": "language",
+	"lan1-2": {
+		"lan2-7w": "copy config",
+		"lan2-80-56": {
+			"lan2-7ssfig": "copy config ${}"
+		},
+		"lan2-8-9": {
+			"aeIsNotRegester": "Android Enterprise activation not finished, click the following button to proceed",
+			"aeIsNotStart": "Android Enterprise not being activated, click the following button to proceed",
+			"delAe": "Deactivate Android Enterprise",
+			"delInfo": "AE system activated, click the button to deactivate.",
+			"enrollAE": "Activate Android Enterprise",
+			"errorInfo": "Server error, please contact your administrator for more",
+			"header": "Android Enterprise Settings",
+			"packageName": "Fill in the package name (please upload the package in the AE private store first; if it's an invalid package name, will not be effective and not interrupt the enrollment)",
+			"settingConfirm": "Activate",
+			"settingProcedureTips": "This customization will be applied to all devices using AE or ZT to enroll. </br> If you need to customize, please contact the administrator",
+			"startAe": "Start Android Enterprise",
+			"stopConfirm": "Deactivate",
+			"toAffirmStartAe": "Confirm to activate Android Enterprise?",
+			"toAffirmStopAe": "Deactivate Android Enterprise will reset all Android Enterprise devices, and all relevant polices will be invalidated."
+			}
 	}
 }

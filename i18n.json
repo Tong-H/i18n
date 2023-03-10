@@ -1,6 +1,0 @@
- {
-	"exclude": ["portal/", "enums/"],
-	"culture": ["en-US", "zh-CN", "ja-JP"],
-	"refer": "en-US",
-	"destination": "demo/languages"
-}
